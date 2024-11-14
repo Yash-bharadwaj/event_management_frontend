@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - EventHub Admin</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    
+    <!-- Custom CSS -->
+    <link href="../../../assets/css/style.css" rel="stylesheet">
+    
+    <style>
+        .admin-sidebar {
+            min-height: calc(100vh - 56px);
+            background: #2c3e50;
+            color: white;
+        }
+
+        .admin-sidebar .nav-link {
+            color: rgba(255,255,255,.8);
+            padding: 0.8rem 1rem;
+            border-radius: 5px;
+            margin: 0.2rem 0;
+        }
+
+        .admin-sidebar .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,.1);
+        }
+
+        .admin-sidebar .nav-link.active {
+            color: white;
+            background: var(--primary-color);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .status-badge {
+            width: 85px;
+        }
+
+        .role-badge {
+            min-width: 100px;
+        }
+
+        .quick-stats {
+            transition: all 0.3s ease;
+        }
+
+        .quick-stats:hover {
+            transform: translateY(-5px);
+        }
+
+        .table th {
+            font-weight: 600;
+            background: #f8f9fa;
+        }
+
+        .activity-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .activity-online {
+            background-color: #198754;
+        }
+
+        .activity-offline {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../../../index.html">
+                <i class="fas fa-calendar-alt me-2"></i>EventHub Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../../index.html">View Site</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-shield me-1"></i> Admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="../profile.html">Profile</a></li>
+                            <li><a class="dropdown-item" href="../settings.html">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="../../../auth/logout.html">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="admin-sidebar pt-5 px-3 position-fixed" style="width: inherit;">
+                    <ul class="nav flex-column mt-3">
+                        <li class="nav-item">
+                            <a class="nav-link" href="../dashboard.html">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../events/list.html">
+                                <i class="fas fa-calendar-alt me-2"></i> Events
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="list.html">
+                                <i class="fas fa-users me-2"></i> Users
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../bookings/list.html">
+                                <i class="fas fa-ticket-alt me-2"></i> Bookings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../reports.html">
+                                <i class="fas fa-chart-bar me-2"></i> Reports
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../settings.html">
+                                <i class="fas fa-cog me-2"></i> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 ms-auto px-4">
+                <div class="container-fluid pt-5">
+                    <!-- Page Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3">Manage Users</h1>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="fas fa-download me-1"></i> Export
+                            </button>
+                            <a href="create.html" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-1"></i> Add User
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card quick-stats bg-primary text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-subtitle mb-2">Total Users</h6>
+                                            <h2 class="card-title mb-0">2,845</h2>
+                                        </div>
+                                        <div class="h1 text-white-50">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card quick-stats bg-success text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-subtitle mb-2">Active Users</h6>
+                                            <h2 class="card-title mb-0">2,156</h2>
+                                        </div>
+                                        <div class="h1 text-white-50">
+                                            <i class="fas fa-user-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card quick-stats bg-info text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-subtitle mb-2">New This Month</h6>
+                                            <h2 class="card-title mb-0">245</h2>
+                                        </div>
+                                        <div class="h1 text-white-50">
+                                            <i class="fas fa-user-plus"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card quick-stats bg-warning text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-subtitle mb-2">Pending</h6>
+                                            <h2 class="card-title mb-0">18</h2>
+                                        </div>
+                                        <div class="h1 text-white-50">
+                                            <i class="fas fa-user-clock"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form class="row g-3">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="searchInput" 
+                                           placeholder="Search users...">
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" id="roleFilter">
+                                        <option value="">All Roles</option>
+                                        <option value="admin">Administrator</option>
+                                        <option value="organizer">Event Organizer</option>
+                                        <option value="user">Regular User</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" id="statusFilter">
+                                        <option value="">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="suspended">Suspended</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-primary me-2">
+                                        <i class="fas fa-filter me-1"></i> Apply Filters
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="resetFilters">
+                                        <i class="fas fa-undo me-1"></i> Reset
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Users Table -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="usersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Role</th>
+                                            <th>Email</th>
+                                            <th>Joined Date</th>
+                                            <th>Status</th>
+                                            <th>Last Active</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Users will be dynamically loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+                    <p class="text-danger"><small>All associated data will also be permanently deleted.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize DataTable
+            const table = $('#usersTable').DataTable({
+                order: [[3, 'desc']],
+                pageLength: 10,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search users..."
+                }
+            });
+
+            // Load Users
+            const users = [
+                {
+                    id: 1,
+                    name: "John Doe",
+                    email: "john.doe@example.com",
+                    role: "admin",
+                    joinDate: "2024-01-15",
+                    status: "active",
+                    lastActive: "2024-03-14T10:30:00",
+                    avatar: "https://ui-avatars.com/api/?name=John+Doe"
+                },
+                {
+                    id: 2,
+                    name: "Jane Smith",
+                    email: "jane.smith@example.com",
+                    role: "organizer",
+                    joinDate: "2024-02-01",
+                    status: "active",
+                    lastActive: "2024-03-14T09:45:00",
+                    avatar: "https://ui-avatars.com/api/?name=Jane+Smith"
+                },
+                {
+                    id: 3,
+                    name: "Mike Johnson",
+                    email: "mike.j@example.com",
+                    role: "user",
+                    joinDate: "2024-03-10",
+                    status: "pending",
+                  lastActive: "2024-03-13T15:20:00",
+                    avatar: "https://ui-avatars.com/api/?name=Mike+Johnson"
+                },
+                {
+                    id: 4,
+                    name: "Sarah Wilson",
+                    email: "sarah.w@example.com",
+                    role: "organizer",
+                    joinDate: "2024-02-15",
+                    status: "suspended",
+                    lastActive: "2024-03-01T11:30:00",
+                    avatar: "https://ui-avatars.com/api/?name=Sarah+Wilson"
+                }
+            ];
+
+            const tbody = document.querySelector('#usersTable tbody');
+
+            users.forEach(user => {
+                const roleClass = user.role === 'admin' ? 'danger' : 
+                                user.role === 'organizer' ? 'success' : 'primary';
+                
+                const statusClass = user.status === 'active' ? 'success' :
+                                  user.status === 'pending' ? 'warning' : 'danger';
+                
+                const isOnline = new Date(user.lastActive) > new Date(Date.now() - 15 * 60 * 1000); // 15 minutes
+
+                const row = `
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="${user.avatar}" class="user-avatar me-2" alt="${user.name}">
+                                <div>
+                                    <div class="fw-bold">${user.name}</div>
+                                    <small class="text-muted">${user.role.charAt(0).toUpperCase() + user.role.slice(1)}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-${roleClass}-subtle text-${roleClass} role-badge">
+                                ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                            </span>
+                        </td>
+                        <td>${user.email}</td>
+                        <td>${new Date(user.joinDate).toLocaleDateString()}</td>
+                        <td>
+                            <span class="badge bg-${statusClass}-subtle text-${statusClass} status-badge">
+                                ${user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span class="activity-indicator ${isOnline ? 'activity-online' : 'activity-offline'}"></span>
+                                ${formatLastActive(user.lastActive)}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="edit.html?id=${user.id}" 
+                                   class="btn btn-outline-primary"
+                                   title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" 
+                                        class="btn btn-outline-success"
+                                        title="Send Message"
+                                        data-user-id="${user.id}">
+                                    <i class="fas fa-envelope"></i>
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-outline-warning"
+                                        title="Access Logs"
+                                        data-user-id="${user.id}">
+                                    <i class="fas fa-history"></i>
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-outline-danger delete-btn"
+                                        title="Delete"
+                                        data-user-id="${user.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+
+            // Format Last Active Time
+            function formatLastActive(lastActive) {
+                const lastActiveDate = new Date(lastActive);
+                const now = new Date();
+                const diffMinutes = Math.floor((now - lastActiveDate) / (1000 * 60));
+                
+                if (diffMinutes < 1) {
+                    return 'Just now';
+                } else if (diffMinutes < 60) {
+                    return `${diffMinutes}m ago`;
+                } else if (diffMinutes < 1440) {
+                    const hours = Math.floor(diffMinutes / 60);
+                    return `${hours}h ago`;
+                } else {
+                    return lastActiveDate.toLocaleDateString();
+                }
+            }
+
+            // Handle Delete
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            let userToDelete = null;
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    userToDelete = this.dataset.userId;
+                    deleteModal.show();
+                });
+            });
+
+            document.getElementById('confirmDelete').addEventListener('click', function() {
+                if (userToDelete) {
+                    // Here you would normally make an API call to delete the user
+                    console.log(`Deleting user ${userToDelete}`);
+                    deleteModal.hide();
+                    
+                    // Show success message
+                    alert('User deleted successfully');
+                    
+                    // Reload page or remove row from table
+                    location.reload();
+                }
+            });
+
+            // Filters
+            document.getElementById('resetFilters').addEventListener('click', function() {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('roleFilter').value = '';
+                document.getElementById('statusFilter').value = '';
+                table.search('').columns().search('').draw();
+            });
+
+            // Role filter
+            document.getElementById('roleFilter').addEventListener('change', function() {
+                table.column(1).search(this.value).draw();
+            });
+
+            // Status filter
+            document.getElementById('statusFilter').addEventListener('change', function() {
+                table.column(4).search(this.value).draw();
+            });
+
+            // Search input
+            document.getElementById('searchInput').addEventListener('keyup', function() {
+                table.search(this.value).draw();
+            });
+
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Update online status indicators periodically
+            setInterval(() => {
+                document.querySelectorAll('.activity-indicator').forEach(indicator => {
+                    const row = indicator.closest('tr');
+                    const lastActiveCell = row.querySelector('td:nth-child(6)');
+                    const lastActiveText = lastActiveCell.textContent;
+                    lastActiveCell.querySelector('div').innerHTML = `
+                        <span class="activity-indicator ${isUserOnline(lastActiveText) ? 'activity-online' : 'activity-offline'}"></span>
+                        ${lastActiveText}
+                    `;
+                });
+            }, 60000); // Update every minute
+
+            function isUserOnline(lastActiveText) {
+                if (lastActiveText.includes('Just now') || lastActiveText.includes('m ago')) {
+                    const minutes = parseInt(lastActiveText);
+                    return !minutes || minutes < 15;
+                }
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - EventHub Admin</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <link href="../../assets/css/style.css" rel="stylesheet">
+    
+    <style>
+        .admin-sidebar {
+            min-height: calc(100vh - 56px);
+            background: #2c3e50;
+            color: white;
+        }
+
+        .admin-sidebar .nav-link {
+            color: rgba(255,255,255,.8);
+            padding: 0.8rem 1rem;
+            border-radius: 5px;
+            margin: 0.2rem 0;
+        }
+
+        .admin-sidebar .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,.1);
+        }
+
+        .admin-sidebar .nav-link.active {
+            color: white;
+            background: var(--primary-color);
+        }
+
+        .stats-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 15px;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .top-table th {
+            font-weight: 600;
+            background: #f8f9fa;
+        }
+
+        .progress-thin {
+            height: 4px;
+        }
+
+        .date-range-selector .btn {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../../index.html">
+                <i class="fas fa-calendar-alt me-2"></i>EventHub Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../index.html">View Site</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-shield me-1"></i> Admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html">Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="../../auth/logout.html">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="admin-sidebar pt-5 px-3 position-fixed" style="width: inherit;">
+                    <ul class="nav flex-column mt-3">
+                        <li class="nav-item">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="events/list.html">
+                                <i class="fas fa-calendar-alt me-2"></i> Events
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="users/list.html">
+                                <i class="fas fa-users me-2"></i> Users
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="bookings/list.html">
+                                <i class="fas fa-ticket-alt me-2"></i> Bookings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="reports.html">
+                                <i class="fas fa-chart-bar me-2"></i> Reports
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="settings.html">
+                                <i class="fas fa-cog me-2"></i> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 ms-auto px-4">
+                <div class="container-fluid pt-5">
+                    <!-- Page Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3">Reports & Analytics</h1>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fas fa-download me-1"></i> Export
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="far fa-file-pdf me-2"></i>PDF Report</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="far fa-file-excel me-2"></i>Excel Export</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="far fa-file-csv me-2"></i>CSV Export</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Date Range Selector -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="btn-group date-range-selector">
+                                        <button type="button" class="btn btn-outline-secondary active">Today</button>
+                                        <button type="button" class="btn btn-outline-secondary">Week</button>
+                                        <button type="button" class="btn btn-outline-secondary">Month</button>
+                                        <button type="button" class="btn btn-outline-secondary">Quarter</button>
+                                        <button type="button" class="btn btn-outline-secondary">Year</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <input type="date" class="form-control form-control-sm" id="startDate">
+                                        <span class="input-group-text">to</span>
+                                        <input type="date" class="form-control form-control-sm" id="endDate">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-primary btn-sm w-100">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card stats-card bg-primary text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-subtitle mb-2">Total Revenue</h6>
+                                            <h2 class="card-title mb-0">$45,289</h2>
+                                            <small class="text-white-50">
+                                                <i class="fas fa-arrow-up me-1"></i>12.5% vs last period
+                                            </small>
+                                        </div>
+                                        <div class="stats-icon bg-white text-primary">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stats-card bg-success text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-subtitle mb-2">Total Bookings</h6>
+                                            <h2 class="card-title mb-0">1,234</h2>
+                                            <small class="text-white-50">
+                                                <i class="fas fa-arrow-up me-1"></i>8.3% vs last period
+                                            </small>
+                                        </div>
+                                        <div class="stats-icon bg-white text-success">
+                                            <i class="fas fa-ticket-alt"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stats-card bg-info text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-subtitle mb-2">Active Events</h6>
+                                            <h2 class="card-title mb-0">156</h2>
+                                            <small class="text-white-50">
+                                                <i class="fas fa-arrow-up me-1"></i>5.2% vs last period
+                                            </small>
+                                        </div>
+                                        <div class="stats-icon bg-white text-info">
+                                            <i class="fas fa-calendar-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stats-card bg-warning text-white">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-subtitle mb-2">New Users</h6>
+                                            <h2 class="card-title mb-0">245</h2>
+                                            <small class="text-white-50">
+                                                <i class="fas fa-arrow-down me-1"></i>3.1% vs last period
+                                            </small>
+                                        </div>
+                                        <div class="stats-icon bg-white text-warning">
+                                            <i class="fas fa-user-plus"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue & Bookings Charts -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Revenue & Bookings</h5>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-outline-secondary active">Daily</button>
+                                        <button type="button" class="btn btn-outline-secondary">Weekly</button>
+                                        <button type="button" class="btn btn-outline-secondary">Monthly</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="revenueChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Event Categories</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="categoryChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Analytics -->
+                    <div class="row">
+                        <!-- Top Events -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Top Performing Events</h5>
+                                    <a href="events/list.html" class="btn btn-sm btn-outline-primary">View All</a>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Event</th>
+                                                <th>Bookings</th>
+                                                <th>Revenue</th>
+                                                <th>Fill Rate</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="topEventsTable">
+                                            <!-- Events will be dynamically loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Analytics -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">User Analytics</h5>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-outline-secondary active">Growth</button>
+                                        <button type="button" class="btn btn-outline-secondary">Engagement</button>
+                                        <button type="button" class="btn btn-outline-secondary">Retention</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="userChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Geographic Distribution -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Geographic Distribution</h5>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Location</th>
+                                                <th>Users</th>
+                                                <th>Events</th>
+                                                <th>Revenue</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="locationTable">
+                                            <!-- Locations will be dynamically loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Conversion Metrics -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Conversion Metrics</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div>
+                                                <h6 class="mb-0">Visit to Registration</h6>
+                                                <small class="text-muted">8.5% vs 7.8% last period</small>
+                                            </div>
+                                            <div class="text-success">8.5%</div>
+                                        </div>
+                                        <div class="progress progress-thin">
+                                            <div class="progress-bar bg-success" style="width: 8.5%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div>
+                                                <h6 class="mb-0">View to Booking</h6>
+                                                <small class="text-muted">12.3% vs 11.5% last period</small>
+                                            </div>
+                                            <div class="text-primary">12.3%</div>
+                                        </div>
+                                        <div class="progress progress-thin">
+                                            <div class="progress-bar bg-primary" style="width: 12.3%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div>
+                                                <h6 class="mb-0">Cart Completion</h6>
+                                                <small class="text-muted">75.8% vs 72.4% last period</small>
+                                            </div>
+                                            <div class="text-info">75.8%</div>
+                                        </div>
+                                        <div class="progress progress-thin">
+                                            <div class="progress-bar bg-info" style="width: 75.8%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div>
+                                                <h6 class="mb-0">User Return Rate</h6>
+                                                <small class="text-muted">45.2% vs 43.8% last period</small>
+                                            </div>
+                                            <div class="text-warning">45.2%</div>
+                                        </div>
+                                        <div class="progress progress-thin">
+                                            <div class="progress-bar bg-warning" style="width: 45.2%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Revenue & Bookings Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: [4500, 5200, 4800, 5900, 6500, 7200],
+                            borderColor: '#0d6efd',
+                            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Bookings',
+                            data: [150, 180, 160, 200, 220, 240],
+                            borderColor: '#198754',
+                            backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Category Chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Music', 'Sports', 'Technology', 'Arts'],
+                    datasets: [{
+                        data: [35, 25, 20, 20],
+                        backgroundColor: [
+                            '#0d6efd',
+                            '#198754',
+                            '#0dcaf0',
+                            '#ffc107'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // User Growth Chart
+            const userCtx = document.getElementById('userChart').getContext('2d');
+            new Chart(userCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'New Users',
+                        data: [120, 150, 180, 220, 260, 300],
+                        borderColor: '#0dcaf0',
+                        backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Load Top Events
+            const topEvents = [
+                {
+                    name: "Summer Music Festival",
+                    bookings: 450,
+                    revenue: 22500,
+                    fillRate: 90
+                },
+                {
+                    name: "Tech Conference 2024",
+                    bookings: 380,
+                    revenue: 19000,
+                    fillRate: 85
+                },
+                {
+                    name: "Sports Tournament",
+                    bookings: 320,
+                    revenue: 16000,
+                    fillRate: 80
+                }
+            ];
+
+            const topEventsTable = document.getElementById('topEventsTable');
+            topEvents.forEach(event => {
+                const row = `
+                    <tr>
+                        <td>${event.name}</td>
+                        <td>${event.bookings}</td>
+                        <td>$${event.revenue}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="progress flex-grow-1" style="height: 4px;">
+                                    <div class="progress-bar" style="width: ${event.fillRate}%"></div>
+                                </div>
+                                <span class="ms-2">${event.fillRate}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                topEventsTable.innerHTML += row;
+            });
+
+            // Load Geographic Data
+            const locations = [
+                {
+                    name: "New York",
+                    users: 1200,
+                    events: 45,
+                    revenue: 58000
+                },
+                {
+                    name: "Los Angeles",
+                    users: 980,
+                    events: 38,
+                    revenue: 45000
+                },
+                {
+                    name: "Chicago",
+                    users: 750,
+                    events: 30,
+                    revenue: 35000
+                }
+            ];
+
+            const locationTable = document.getElementById('locationTable');
+            locations.forEach(location => {
+                const row = `
+                    <tr>
+                        <td>${location.name}</td>
+                        <td>${location.users}</td>
+                        <td>${location.events}</td>
+                        <td>$${location.revenue}</td>
+                    </tr>
+                `;
+                locationTable.innerHTML += row;
+            });
+
+            // Date Range Selector
+            document.querySelectorAll('.date-range-selector .btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.date-range-selector .btn').forEach(b => 
+                        b.classList.remove('active'));
+                    this.classList.add('active');
+                    // Add date range update logic here
+                });
+            });
+        });
+    </script>
+</body>
+</html>

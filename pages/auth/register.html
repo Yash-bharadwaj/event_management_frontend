@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - EventHub</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link href="../../assets/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="../../index.html">
+                <i class="fas fa-calendar-alt me-2"></i>EventHub
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="list.html">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="search.html">Search</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../auth/login.html">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../auth/register.html">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-5 pt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-sm border-0" data-aos="fade-up">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                            <h2 class="fw-bold">Create Account</h2>
+                            <p class="text-muted">Join our community and start organizing events</p>
+                        </div>
+
+                        <form id="registerForm" class="needs-validation" novalidate>
+                            <!-- Personal Information -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" required>
+                                    <div class="invalid-feedback">
+                                        First name is required
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" required>
+                                    <div class="invalid-feedback">
+                                        Last name is required
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-envelope"></i>
+                                    </span>
+                                    <input type="email" class="form-control" id="email" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid email address
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    <input type="password" class="form-control" id="password" 
+                                           pattern=".{8,}" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <div class="invalid-feedback">
+                                        Password must be at least 8 characters long
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                    <input type="password" class="form-control" id="confirmPassword" required>
+                                    <div class="invalid-feedback">
+                                        Passwords do not match
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" required>
+                                    <label class="form-check-label" for="terms">
+                                        I agree to the <a href="#" class="text-primary">Terms of Service</a> and 
+                                        <a href="#" class="text-primary">Privacy Policy</a>
+                                    </label>
+                                    <div class="invalid-feedback">
+                                        You must agree before submitting
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mb-3">
+                                <i class="fas fa-user-plus me-2"></i> Create Account
+                            </button>
+
+                            <div class="text-center">
+                                <p class="mb-0">Already have an account? 
+                                    <a href="login.html" class="text-primary text-decoration-none">Login</a>
+                                </p>
+                            </div>
+                        </form>
+
+                        <div class="position-relative my-4">
+                            <hr>
+                            <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">
+                                or register with
+                            </span>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button class="btn btn-outline-danger w-100">
+                                    <i class="fab fa-google me-2"></i> Google
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-outline-primary w-100">
+                                    <i class="fab fa-facebook me-2"></i> Facebook
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password Requirements -->
+                <div class="card mt-3 shadow-sm border-0" id="passwordRequirements">
+                    <div class="card-body">
+                        <h6 class="mb-3">Password Requirements:</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2" id="lengthReq">
+                                <i class="fas fa-times-circle text-danger me-2"></i>
+                                At least 8 characters long
+                            </li>
+                            <li class="mb-2" id="upperReq">
+                                <i class="fas fa-times-circle text-danger me-2"></i>
+                                One uppercase letter
+                            </li>
+                            <li class="mb-2" id="lowerReq">
+                                <i class="fas fa-times-circle text-danger me-2"></i>
+                                One lowercase letter
+                            </li>
+                            <li class="mb-2" id="numberReq">
+                                <i class="fas fa-times-circle text-danger me-2"></i>
+                                One number
+                            </li>
+                            <li id="specialReq">
+                                <i class="fas fa-times-circle text-danger me-2"></i>
+                                One special character
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const togglePassword = document.getElementById('togglePassword');
+            const requirements = {
+                lengthReq: password => password.length >= 8,
+                upperReq: password => /[A-Z]/.test(password),
+                lowerReq: password => /[a-z]/.test(password),
+                numberReq: password => /[0-9]/.test(password),
+                specialReq: password => /[^A-Za-z0-9]/.test(password)
+            };
+
+            // Update password requirements visual feedback
+            function updateRequirements(password) {
+                Object.keys(requirements).forEach(req => {
+                    const element = document.getElementById(req);
+                    const icon = element.querySelector('i');
+                    if (requirements[req](password)) {
+                        icon.classList.replace('fa-times-circle', 'fa-check-circle');
+                        icon.classList.replace('text-danger', 'text-success');
+                    } else {
+                        icon.classList.replace('fa-check-circle', 'fa-times-circle');
+                        icon.classList.replace('text-success', 'text-danger');
+                    }
+                });
+            }
+
+            // Password input event listener
+            password.addEventListener('input', function() {
+                updateRequirements(this.value);
+                validatePasswords();
+            });
+
+            // Confirm password validation
+            function validatePasswords() {
+                if (confirmPassword.value && password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity('Passwords do not match');
+                } else {
+                    confirmPassword.setCustomValidity('');
+                }
+            }
+
+            confirmPassword.addEventListener('input', validatePasswords);
+
+            // Toggle password visibility
+            togglePassword.addEventListener('click', function() {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+
+            // Form submission
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                if (!form.checkValidity()) {
+                    event.stopPropagation();
+                } else {
+                    // Simulate successful registration
+                    window.location.href = 'login.html?registered=true';
+                }
+                
+                form.classList.add('was-validated');
+            });
+        });
+    </script>
+</body>
+</html>
